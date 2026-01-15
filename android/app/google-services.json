@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1015566366361",
+    "project_id": "mmp--mymarketplace",
+    "storage_bucket": "mmp--mymarketplace.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015566366361:android:77e73796aab2a4843f2a08",
+        "android_client_info": {
+          "package_name": "com.example.shopping_app_olx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAX-DNcknidZS4yF39jn-XIwZO0aKLDEB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
