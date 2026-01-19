@@ -5,16 +5,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-import java.util.Properties
-import java.io.FileInputStream
-
-val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-}
-
 android {
     namespace = "com.myMarketPlace"
     compileSdk = flutter.compileSdkVersion
@@ -52,17 +42,18 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
-            storePassword = keystoreProperties["storePassword"] as String?
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
+            storeFile = file("C:/Users/Globally-04/Documents/Classify-main/classify.jks")
+            storePassword = "123456"
+            keyAlias = "classify"
+            keyPassword = "123456"
         }
     }
 
+
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false // Enable minification
-            isShrinkResources = false // Enable resource shrinking
+            isMinifyEnabled = true // Enable minification
+            isShrinkResources = true // Enable resource shrinking
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }

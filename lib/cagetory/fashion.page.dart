@@ -70,14 +70,12 @@ class _FashionPageState extends State<FashionPage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
-                              builder: (context) => FashionFormPage(),
-                              settings: RouteSettings(arguments: true)
+                            builder: (context) => FashionFormPage(),
+                            settings: RouteSettings(arguments: true),
                           ),
-
                         );
                       },
                       child: PropertyBody(txt: "Men"),
@@ -88,10 +86,9 @@ class _FashionPageState extends State<FashionPage> {
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
-                              builder: (context) => FashionFormPage(),
-                              settings: RouteSettings(arguments: true)
+                            builder: (context) => FashionFormPage(),
+                            settings: RouteSettings(arguments: true),
                           ),
-
                         );
                       },
                       child: PropertyBody(txt: "Women"),
@@ -102,10 +99,9 @@ class _FashionPageState extends State<FashionPage> {
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
-                              builder: (context) => FashionFormPage(),
-                              settings: RouteSettings(arguments: true)
+                            builder: (context) => FashionFormPage(),
+                            settings: RouteSettings(arguments: true),
                           ),
-
                         );
                       },
                       child: PropertyBody(txt: "Kids"),

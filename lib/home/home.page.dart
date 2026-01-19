@@ -884,11 +884,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                                                           ),
                                                         ),
                                                       ),
-
-                                                      //   ],
-                                                      // ),
-
-                                                      // ),
                                                     ],
                                                   ),
 
@@ -1752,7 +1747,6 @@ class _AllProductBodyState extends ConsumerState<AllProductBody> {
                                   ],
                                 ),
                               ),
-                              // ),
                             ],
                           ),
 

@@ -29,7 +29,9 @@ class AddproductRegisterController {
     required String user_id,
     required File image,
   }) async {
-    final Uri url = Uri.parse('https://classify.mymarketplace.co.in/api/Add/product');
+    final Uri url = Uri.parse(
+      'https://classify.mymarketplace.co.in/api/Add/product',
+    );
     var request = http.MultipartRequest("POST", url);
     request.headers.addAll({
       "Accept": "application/json", // Ensure content type is correct

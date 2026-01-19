@@ -580,7 +580,6 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
   }
 }*/
 
-
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -651,14 +650,14 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
     }
     if (product.image != null && product.image!.isNotEmpty) {
       setState(() {
-        existingImageUrls = product.image!.split(',').map((url) => url.trim()).toList();
+        existingImageUrls =
+            product.image!.split(',').map((url) => url.trim()).toList();
       });
     }
   }
 
   Future<void> pickImageFromCamera() async {
-    final XFile? photo =
-    await picker.pickImage(source: ImageSource.camera);
+    final XFile? photo = await picker.pickImage(source: ImageSource.camera);
 
     if (photo != null) {
       setState(() {
@@ -667,9 +666,10 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
     }
   }
 
-    Future<void> pickImageFromGallery() async {
-    final List<XFile> pickedImages =
-    await picker.pickMultiImage(imageQuality: 70);
+  Future<void> pickImageFromGallery() async {
+    final List<XFile> pickedImages = await picker.pickMultiImage(
+      imageQuality: 70,
+    );
 
     if (pickedImages.isNotEmpty) {
       setState(() {
@@ -731,7 +731,9 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
         int.tryParse(yearController.text.trim()) == null ||
         int.parse(yearController.text.trim()) < 1900 ||
         int.parse(yearController.text.trim()) > DateTime.now().year) {
-      Fluttertoast.showToast(msg: "Please enter a valid year (1900-${DateTime.now().year})");
+      Fluttertoast.showToast(
+        msg: "Please enter a valid year (1900-${DateTime.now().year})",
+      );
       return false;
     }
     if (fuelController.text.trim().isEmpty) {
@@ -741,7 +743,9 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
     if (kmDrivenController.text.trim().isEmpty ||
         int.tryParse(kmDrivenController.text.trim()) == null ||
         int.parse(kmDrivenController.text.trim()) < 0) {
-      Fluttertoast.showToast(msg: "Please enter a valid KM driven (non-negative)");
+      Fluttertoast.showToast(
+        msg: "Please enter a valid KM driven (non-negative)",
+      );
       return false;
     }
     if (modelController.text.trim().isEmpty) {
@@ -773,12 +777,15 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_didRedirect) return;
-    final shouldRedirect = ModalRoute.of(context)?.settings.arguments as bool? ?? false;
+    final shouldRedirect =
+        ModalRoute.of(context)?.settings.arguments as bool? ?? false;
     if (shouldRedirect) {
       _didRedirect = true;
       Future.delayed(const Duration(milliseconds: 100), () {
         if (mounted) {
-          Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MapPage()));
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const MapPage()));
         }
       });
     }
@@ -873,7 +880,8 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                       FormBody(
                         labeltxt: "Ad Title*",
                         controller: titleController,
-                        helper: "Mention the key features (e.g., brand, model, year, condition)",
+                        helper:
+                            "Mention the key features (e.g., brand, model, year, condition)",
                       ),
                       SizedBox(height: 15.h),
                       FormBody(
@@ -886,154 +894,192 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                       FormBody(
                         labeltxt: "Description*",
                         controller: descriptionController,
-                        helper: "Include condition, features, and reason for selling",
+                        helper:
+                            "Include condition, features, and reason for selling",
                         maxLength: 4096,
                       ),
                       SizedBox(height: 20.h),
                       Container(
                         height: 216.h,
-                        child: (images.isEmpty && existingImageUrls.isEmpty)
-                            ? GestureDetector(
-                          onTap: showImage,
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15.r),
-                              color: Colors.white,
-                              border: Border.all(color: Colors.grey, width: 1.w),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.upload),
-                                Text("Upload Images"),
-                              ],
-                            ),
-                          ),
-                        )
-                            : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: existingImageUrls.length + images.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index < existingImageUrls.length) {
-                              return Stack(
-                                children: [
-                                  Container(
-                                    width: 100.w,
-                                    margin: EdgeInsets.only(right: 8.w),
-                                    child: ClipRRect(
+                        child:
+                            (images.isEmpty && existingImageUrls.isEmpty)
+                                ? GestureDetector(
+                                  onTap: showImage,
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(15.r),
-                                      child: Image.network(
-                                        existingImageUrls[index],
-                                        height: 216.h,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => Icon(
-                                          Icons.error,
-                                          size: 50,
-                                          color: Colors.red,
-                                        ),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: 1.w,
                                       ),
                                     ),
-                                  ),
-                                  Positioned(
-                                    right: 8.w,
-                                    top: 0,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          existingImageUrls.removeAt(index);
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.red,
-                                        ),
-                                        child: const Icon(
-                                          Icons.close,
-                                          size: 16,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(Icons.upload),
+                                        Text("Upload Images"),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              );
-                            } else if (index < existingImageUrls.length + images.length) {
-                              final imageIndex = index - existingImageUrls.length;
-                              return Stack(
-                                children: [
-                                  Container(
-                                    width: 100.w,
-                                    margin: EdgeInsets.only(right: 8.w),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(15.r),
-                                      child: Image.file(
-                                        File(images[imageIndex].path),
-                                        height: 216.h,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: 8.w,
-                                    top: 0,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          images.removeAt(imageIndex);
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.red,
+                                )
+                                : ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      existingImageUrls.length +
+                                      images.length +
+                                      1,
+                                  itemBuilder: (context, index) {
+                                    if (index < existingImageUrls.length) {
+                                      return Stack(
+                                        children: [
+                                          Container(
+                                            width: 100.w,
+                                            margin: EdgeInsets.only(right: 8.w),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.r),
+                                              child: Image.network(
+                                                existingImageUrls[index],
+                                                height: 216.h,
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) => Icon(
+                                                      Icons.error,
+                                                      size: 50,
+                                                      color: Colors.red,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 8.w,
+                                            top: 0,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  existingImageUrls.removeAt(
+                                                    index,
+                                                  );
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  4,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.red,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 16,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    } else if (index <
+                                        existingImageUrls.length +
+                                            images.length) {
+                                      final imageIndex =
+                                          index - existingImageUrls.length;
+                                      return Stack(
+                                        children: [
+                                          Container(
+                                            width: 100.w,
+                                            margin: EdgeInsets.only(right: 8.w),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.r),
+                                              child: Image.file(
+                                                File(images[imageIndex].path),
+                                                height: 216.h,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 8.w,
+                                            top: 0,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  images.removeAt(imageIndex);
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  4,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.red,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 16,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return GestureDetector(
+                                        onTap:
+                                            images.length +
+                                                        existingImageUrls
+                                                            .length <
+                                                    5
+                                                ? showImage
+                                                : () {
+                                                  Fluttertoast.showToast(
+                                                    msg:
+                                                        "Maximum 5 images allowed",
+                                                    toastLength:
+                                                        Toast.LENGTH_LONG,
+                                                  );
+                                                },
+                                        child: Container(
+                                          width: 100.w,
+                                          margin: EdgeInsets.only(right: 8.w),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              15.r,
+                                            ),
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 1.w,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: const [
+                                              Icon(Icons.add),
+                                              Text("Add More"),
+                                            ],
+                                          ),
                                         ),
-                                        child: const Icon(
-                                          Icons.close,
-                                          size: 16,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              return GestureDetector(
-                                onTap: images.length + existingImageUrls.length < 5
-                                    ? showImage
-                                    : () {
-                                  Fluttertoast.showToast(
-                                    msg: "Maximum 5 images allowed",
-                                    toastLength: Toast.LENGTH_LONG,
-                                  );
-                                },
-                                child: Container(
-                                  width: 100.w,
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.r),
-                                    color: Colors.white,
-                                    border: Border.all(color: Colors.grey, width: 1.w),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(Icons.add),
-                                      Text("Add More"),
-                                    ],
-                                  ),
+                                      );
+                                    }
+                                  },
                                 ),
-                              );
-                            }
-                          },
-                        ),
                       ),
                       SizedBox(height: 40.h),
-                  /*    ElevatedButton(
+
+                      /*    ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(
                             MediaQuery.of(context).size.width,
@@ -1160,12 +1206,18 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                           ),
                         ),
                       ),*/
-
-
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(MediaQuery.of(context).size.width, 49.h),
-                          backgroundColor: const Color.fromARGB(255, 137, 26, 255),
+                          minimumSize: Size(
+                            MediaQuery.of(context).size.width,
+                            49.h,
+                          ),
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            137,
+                            26,
+                            255,
+                          ),
                         ),
                         onPressed: () async {
                           if (!_validateForm()) return;
@@ -1177,10 +1229,12 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                           // Images ko MultipartFile mein convert karo
                           List<MultipartFile> imageFiles = [];
                           for (var img in images) {
-                            imageFiles.add(await MultipartFile.fromFile(
-                              img.path,
-                              filename: img.path.split("/").last,
-                            ));
+                            imageFiles.add(
+                              await MultipartFile.fromFile(
+                                img.path,
+                                filename: img.path.split("/").last,
+                              ),
+                            );
                           }
 
                           // Product data ready karo (PlanPage ke liye reuse ke liye)
@@ -1205,8 +1259,11 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                           };
 
                           // Editing mode mein existing images add karo
-                          if (isEditing && widget.productToEdit != null && existingImageUrls.isNotEmpty) {
-                            productData['existing_images'] = existingImageUrls.join(',');
+                          if (isEditing &&
+                              widget.productToEdit != null &&
+                              existingImageUrls.isNotEmpty) {
+                            productData['existing_images'] = existingImageUrls
+                                .join(',');
                           }
 
                           try {
@@ -1215,14 +1272,17 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                             final apiService = APIService(await createDio());
 
                             if (isEditing && widget.productToEdit != null) {
-                              await apiService.updateProduct(widget.productToEdit!.id!, productData);
+                              await apiService.updateProduct(
+                                widget.productToEdit!.id!,
+                                productData,
+                              );
                               Fluttertoast.showToast(
                                 msg: "Scooter Listing Updated Successfully",
                                 toastLength: Toast.LENGTH_LONG,
                               );
                             } else {
                               await apiService.addProduct(productData);
-                             
+
                               Fluttertoast.showToast(
                                 msg: "Scooter Listing Added Successfully",
                                 toastLength: Toast.LENGTH_LONG,
@@ -1233,27 +1293,34 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                             Navigator.pushAndRemoveUntil(
                               context,
                               CupertinoPageRoute(builder: (_) => HomePage()),
-                                  (route) => false,
+                              (route) => false,
                             );
                           } catch (e) {
                             log("Error: ${e.toString()}");
                             setState(() => isLoading = false);
 
-                            String errorMessage = "An error occurred. Please try again.";
+                            String errorMessage =
+                                "An error occurred. Please try again.";
                             bool needsPlan = false;
 
                             if (e is DioError) {
-                              errorMessage = e.response?.data['message']?.toString() ??
+                              errorMessage =
+                                  e.response?.data['message']?.toString() ??
                                   "Failed to process scooter listing.";
 
                               if (e.response?.statusCode == 429) {
-                                errorMessage = "You can only add one product every 24 hours.";
+                                errorMessage =
+                                    "You can only add one product every 24 hours.";
                               }
 
                               // Plan/subscription related error detect karo
                               if (errorMessage.toLowerCase().contains("plan") ||
-                                  errorMessage.toLowerCase().contains("purchase") ||
-                                  errorMessage.toLowerCase().contains("subscription")) {
+                                  errorMessage.toLowerCase().contains(
+                                    "purchase",
+                                  ) ||
+                                  errorMessage.toLowerCase().contains(
+                                    "subscription",
+                                  )) {
                                 needsPlan = true;
                               }
                             }
@@ -1268,7 +1335,8 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                               Navigator.push(
                                 context,
                                 CupertinoPageRoute(
-                                  builder: (context) => PlanPage(productData, true),
+                                  builder:
+                                      (context) => PlanPage(productData, true),
                                 ),
                               );
                             } else {
@@ -1277,23 +1345,24 @@ class _ScooterFormPageState extends ConsumerState<ScooterFormPage> {
                           }
                         },
                         child: Center(
-                          child: isLoading
-                              ? SizedBox(
-                            width: 20.w,
-                            height: 20.h,
-                            child: const CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                              : Text(
-                            isEditing ? "Update" : "Continue",
-                            style: GoogleFonts.dmSans(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
+                          child:
+                              isLoading
+                                  ? SizedBox(
+                                    width: 20.w,
+                                    height: 20.h,
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : Text(
+                                    isEditing ? "Update" : "Continue",
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                         ),
                       ),
                       SizedBox(height: 10.h),
