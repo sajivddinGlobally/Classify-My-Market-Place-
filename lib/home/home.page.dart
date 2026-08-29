@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,6 +23,7 @@ import 'package:shopping_app_olx/map/map.page.dart';
 import 'package:shopping_app_olx/map/service/locationController.dart';
 import 'package:shopping_app_olx/particularDeals/particularDeals.page.dart';
 import 'package:shopping_app_olx/profile/profile.page.dart';
+import '../main.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   final int? page;
@@ -112,7 +112,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _showSafetyOverlay = true; // Pehli baar true, baad mein false
-
   // @override
   // void initState() {
   //   super.initState();
@@ -137,8 +136,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     var box = Hive.box("data");
     String? userId = box.get(
       "id",
-    ); // Jo bhi aapka user ID key hai (login ke time save hota hai)
+    ); // Jo bhi aapka user ID key hai (login ke time save hota hai)4
 
+    facebookAppEvents.logEvent(name: "app_open");
     if (userId != null) {
       // Har user ke liye alag key: "safety_seen_user_12345"
       String safetyKey = "safety_seen_user_$userId";
@@ -147,7 +147,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       // Agar user logged out hai (koi ID nahi), to warning dikhao
       _showSafetyOverlay = true;
     }
-
     tabBottom = widget.page ?? 0;
     _searchController.addListener(() {
       setState(() {
@@ -168,7 +167,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _isAdLoaded = false;
   final String _adUnitId =
       'ca-app-pub-2570891403857959/6661669048'; // live add mob Id.33
-
   void _loadBannerAd() {
     _bannerAd = BannerAd(
       adUnitId: _adUnitId,
@@ -202,28 +200,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
 
     return WillPopScope(
-      /* onWillPop: () async {
-        if (tabBottom != 0) {
-          setState(() {
-            tabBottom = 0;
-          });
-          return false;
-        }
-        final now = DateTime.now();
-        if (lastBackPressTime == null ||
-            now.difference(lastBackPressTime!) > const Duration(seconds: 2)) {
-          lastBackPressTime = now;
-          Fluttertoast.showToast(
-            msg: "Press back again to exit",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.black54,
-            textColor: Colors.white,
-          );
-          return false;
-        }
-        return true;
-      },*/
       onWillPop: () async {
         // Back button bhi tab tak block agar overlay dikhe
         if (_showSafetyOverlay) return false;

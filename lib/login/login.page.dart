@@ -5,10 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 import 'package:shopping_app_olx/config/pretty.dio.dart';
+import 'package:shopping_app_olx/facebookLogin/facebookService.dart';
+import 'package:shopping_app_olx/googleLogin/googleAuthService.dart';
+import 'package:shopping_app_olx/googleLogin/googleService.dart';
+import 'package:shopping_app_olx/googleLogin/model/googleLoginBodyModel.dart';
+import 'package:shopping_app_olx/home/home.page.dart';
 import 'package:shopping_app_olx/login/Model/loginBodyModel.dart';
 import 'package:shopping_app_olx/login/otp.page.dart';
 import 'package:shopping_app_olx/login/service/loginService.dart';
+import 'package:shopping_app_olx/new/new.service.dart';
 import 'package:shopping_app_olx/register/register.page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,13 +24,12 @@ class LoginPage extends StatefulWidget {
 
   @override
   State<LoginPage> createState() => _LoginPageState();
-
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final phoneController = TextEditingController();
   bool islogin = false;
+  bool termsAccepted = false; // ← new state variable
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +37,11 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Stack(
           children: [
-
             Container(
-              height: MediaQuery.of(context).size.height + 50,
+              // height: MediaQuery.of(context).size.height + 50,
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height + 250,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -49,10 +58,8 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Image.asset("assets/loginimage.png"),
                   SizedBox(height: 50.h),
-
 
                   Center(
                     child: Text(
@@ -64,7 +71,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
 
                   Padding(
                     padding: EdgeInsets.only(left: 44.w, right: 44.w),
@@ -79,7 +85,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-
 
                   SizedBox(height: 40.h),
                   Padding(
@@ -117,8 +122,60 @@ class _LoginPageState extends State<LoginPage> {
 
                         SizedBox(height: 30.h),
 
-                        ElevatedButton(
+                        // ── Checkbox + Terms & Conditions ────────────────────────
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 24.h,
+                              width: 24.w,
+                              child: Checkbox(
+                                value: termsAccepted,
+                                activeColor: Color(0xFF891AFF),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.r),
+                                ),
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    termsAccepted = value ?? false;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: "I agree to the ",
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 14.sp,
+                                    color: Color(0xFF615B68),
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: "Terms & Conditions",
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: 14.sp,
+                                        color: Color(0xFF891AFF),
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      // Optional: add recognizer to open terms page
+                                      // recognizer: TapGestureRecognizer()
+                                      //   ..onTap = () {
+                                      //     // Navigator.push(... Terms page)
+                                      //   },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
 
+                        SizedBox(height: 24.h),
+
+                        ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(
                               MediaQuery.of(context).size.width,
@@ -126,8 +183,18 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             backgroundColor: Color.fromARGB(255, 137, 26, 255),
                           ),
-
                           onPressed: () async {
+                            // ── First check terms ─────────────────────────────
+                            if (!termsAccepted) {
+                              Fluttertoast.showToast(
+                                msg: "Please accept Terms & Conditions",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                              );
+                              return;
+                            }
+
+                            // ── Then check phone number ───────────────────────
                             if (phoneController.text.isEmpty ||
                                 phoneController.text.length != 10) {
                               Fluttertoast.showToast(
@@ -135,6 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                               );
                               return;
                             }
+
                             setState(() {
                               islogin = true;
                             });
@@ -151,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                               final response = await loginservice.login(body);
 
                               Fluttertoast.showToast(
-                                msg: response.message??""
+                                msg: response.message ?? "",
                               );
 
                               setState(() {
@@ -166,15 +234,6 @@ class _LoginPageState extends State<LoginPage> {
                                           OtpPage(phone: phoneController.text),
                                 ),
                               );
-
-                              Fluttertoast.showToast(
-                                msg: "${response.message}",
-                                fontSize: 30.sp,
-                                timeInSecForIosWeb: 40,
-                                gravity: ToastGravity.TOP,
-                                toastLength: Toast.LENGTH_LONG,
-                              );
-
                             } on DioException catch (e) {
                               setState(() {
                                 islogin = false;
@@ -189,17 +248,14 @@ class _LoginPageState extends State<LoginPage> {
                                 islogin = false;
                               });
                               Fluttertoast.showToast(
-                                msg: "Login Failed Try again.",
+                                msg: "Login Failed. Try again.",
                               );
                               log(e.toString());
                             }
                           },
-
                           child:
                               islogin == false
-                                  ?
-
-                              Text(
+                                  ? Text(
                                     "Login",
                                     style: GoogleFonts.dmSans(
                                       fontSize: 15.sp,
@@ -207,10 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Colors.white,
                                     ),
                                   )
-
-                                  :
-
-                              SizedBox(
+                                  : SizedBox(
                                     height: 30,
                                     width: 30,
                                     child: Center(
@@ -219,9 +272,264 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     ),
                                   ),
-
                         ),
+                        SizedBox(height: 20.h),
+                        Row(
+                          children: [
+                            Expanded(child: Divider()),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12.w),
+                              child: Text(
+                                "OR",
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 14.sp,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider()),
+                          ],
+                        ),
+                        SizedBox(height: 20.h),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            try {
+                              showDialog(
+                                barrierDismissible: false,
+                                barrierColor: Colors.transparent,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    backgroundColor: Colors.transparent,
+                                    content: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                              final googleAuth = GoogleAuthService();
 
+                              final String? idToken =
+                                  await googleAuth.signInWithGoogle();
+
+                              if (idToken == null) {
+                                Fluttertoast.showToast(
+                                  msg: "Google Sign-In Failed",
+                                );
+                                return;
+                              }
+                              final body = GoogleLoginBodyResModel(
+                                idToken: idToken,
+                              );
+
+                              final service = GoogleService(createDio());
+
+                              final response = await service.googleLogin(body);
+
+                              if (response.status == true) {
+                                var box = await Hive.openBox("data");
+
+                                await box.put("token", response.token);
+                                await box.put(
+                                  "id",
+                                  response.user!.id.toString(),
+                                );
+                                await box.put(
+                                  "full_name",
+                                  response.user!.fullName ?? "",
+                                );
+                                await box.put(
+                                  "address",
+                                  response.user!.address ?? "",
+                                );
+                                await box.put(
+                                  "city",
+                                  response.user!.city ?? "",
+                                );
+                                await box.put(
+                                  "phone_number",
+                                  response.user!.phoneNumber,
+                                );
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => HomePage(),
+                                  ),
+                                  (route) => false,
+                                );
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: response.message ?? "Login Failed",
+                                );
+                                if (Navigator.canPop(context)) {
+                                  Navigator.of(
+                                    context,
+                                    rootNavigator: true,
+                                  ).pop();
+                                }
+                              }
+                            } catch (e, stackTrace) {
+                              log("ERROR: $e");
+                              log("STACK: $stackTrace");
+
+                              Fluttertoast.showToast(
+                                msg: "Something went wrong",
+                              );
+                            } finally {
+                              if (Navigator.canPop(context)) {
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 52.h),
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            elevation: 0,
+                            side: BorderSide(color: Colors.grey.shade300),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.r),
+                            ),
+                          ),
+                          icon: Image.asset("assets/g.png", height: 24),
+                          label: Text(
+                            "Continue with Google",
+                            style: GoogleFonts.dmSans(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20.w),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            try {
+                              showDialog(
+                                barrierDismissible: false,
+                                barrierColor: Colors.transparent,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    backgroundColor: Colors.transparent,
+                                    content: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+
+                              final facebookAuth = FacebookAuthService();
+
+                              final String? token =
+                                  await facebookAuth.signInWithFacebook();
+
+                              if (token == null) {
+                                if (Navigator.canPop(context)) {
+                                  Navigator.pop(context);
+                                }
+
+                                Fluttertoast.showToast(
+                                  msg: "Facebook Login Failed or Cancelled",
+                                );
+                                return;
+                              }
+
+                              log("Facebook Token => $token");
+
+                              final body = FacebookLoginBodyModel(
+                                accessToken: token,
+                              );
+                              final service = GoogleService(createDio());
+                              final response = await service.facebookLogin(
+                                body,
+                              );
+                              if (response.status == true) {
+                                var box = await Hive.openBox("data");
+
+                                await box.put("token", response.token);
+                                await box.put(
+                                  "id",
+                                  response.user!.id.toString(),
+                                );
+                                await box.put(
+                                  "full_name",
+                                  response.user!.fullName ?? "",
+                                );
+                                await box.put(
+                                  "address",
+                                  response.user!.address ?? "",
+                                );
+                                await box.put(
+                                  "city",
+                                  response.user!.city ?? "",
+                                );
+                                await box.put(
+                                  "phone_number",
+                                  response.user!.phoneNumber,
+                                );
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => HomePage(),
+                                  ),
+                                  (route) => false,
+                                );
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: response.message ?? "Login Failed",
+                                );
+                                if (Navigator.canPop(context)) {
+                                  Navigator.of(
+                                    context,
+                                    rootNavigator: true,
+                                  ).pop();
+                                }
+                              }
+                            } catch (e, stackTrace) {
+                              log("ERROR: $e");
+                              log("STACK: $stackTrace");
+
+                              Fluttertoast.showToast(
+                                msg: "Something went wrong",
+                              );
+                            } finally {
+                              if (Navigator.canPop(context)) {
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 52.h),
+                            backgroundColor: Color(0xFF1877F2),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.r),
+                            ),
+                          ),
+                          icon: Image.asset(
+                            "assets/f.png",
+                            height: 24,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            "Continue with Facebook",
+                            style: GoogleFonts.dmSans(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                         SizedBox(height: 50.h),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -258,16 +566,18 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 
-
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
+  }
 }

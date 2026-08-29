@@ -24,20 +24,13 @@ class _OtpPageState extends ConsumerState<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      body:
-
-      SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Stack(
               children: [
-
-
                 Container(
                   height: MediaQuery.of(context).size.height,
                   decoration: BoxDecoration(
@@ -58,7 +51,6 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       SizedBox(
                         width: double.infinity, // ya specific width
                         height: 350.h, // aapki desired height
@@ -97,7 +89,7 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Which is",
+                            "Which is ",
                             style: GoogleFonts.dmSans(
                               fontWeight: FontWeight.w500,
                               fontSize: 16.sp,
@@ -119,7 +111,6 @@ class _OtpPageState extends ConsumerState<OtpPage> {
 
                       SizedBox(height: 30.h),
 
-
                       OtpPinField(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         fieldHeight: 45,
@@ -129,14 +120,14 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                           activeFieldBorderColor: Color(0XFF891AFF),
                         ),
                         otpPinFieldDecoration:
-                        OtpPinFieldDecoration.roundedPinBoxDecoration,
+                            OtpPinFieldDecoration.roundedPinBoxDecoration,
                         maxLength: 6,
                         onChange: (value) {
                           setState(() {
                             otp = value;
                           });
                         },
-                        onSubmit: (String text) {  },
+                        onSubmit: (String text) {},
                         // onSubmit: (value) async {
                         //
                         //   final FirebaseMessaging _firebaseMessaging =
@@ -193,10 +184,6 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                         // },
                       ),
 
-
-
-
-
                       SizedBox(height: 20),
                       Container(
                         child: Row(
@@ -229,51 +216,76 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                         ),
                       ),
 
-
-
+                      // SizedBox(height: 20.h,),
+                      Expanded(child: SizedBox()),
                       Center(
                         child: SizedBox(
                           width: 280.w,
                           height: 56.h,
                           child: ElevatedButton(
-                            onPressed: otp.length == 6
-                                ? () async {
-                              // Yahi code jo pehle onSubmit mein tha, ab yahan
-                              final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-                              String? token = await _firebaseMessaging.getToken();
+                            onPressed:
+                                otp.length == 6
+                                    ? () async {
+                                      // Yahi code jo pehle onSubmit mein tha, ab yahan
+                                      final FirebaseMessaging
+                                      _firebaseMessaging =
+                                          FirebaseMessaging.instance;
+                                      String? token =
+                                          await _firebaseMessaging.getToken();
 
-                              print("sdfsdf${token}");
+                                      print("sdfsdf${token}");
 
-                              final otpBody = OtpBodyModel(
-                                phone_number: widget.phone,
-                                otp: otp,
-                                fcm_token: token ?? "",
-                              );
+                                      final otpBody = OtpBodyModel(
+                                        phone_number: widget.phone,
+                                        otp: otp,
+                                        fcm_token: token ?? "",
+                                      );
 
-                              try {
-
-                                // Loading dikhane ke liye Riverpod state use kar rahe hain
-                                final response = await ref.read(otpProvider(otpBody).future);
-                                var box = await Hive.openBox("data");
-                                await box.put("token", response.token);
-                                await box.put("id", response.user!.id.toString());
-                                await box.put("fullName", response.user!.fullName ?? "");
-                                await box.put("address", response.user!.address ?? "");
-                                await box.put("city", response.user!.city ?? "");
-                                await box.put("phoneNumber", response.user!.phoneNumber);
-                                Fluttertoast.showToast(msg: "Login Successful");
-                                Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (_) => HomePage()), (route) => false,);
-
-                              }
-
-                              catch (e) {
-                                log("OTP Verification Failed: $e");
-                                Fluttertoast.showToast(msg: "Invalid OTP");
-                              }
-
-
-                            }
-                                : null, // Jab OTP < 6 ho, button disabled
+                                      try {
+                                        // Loading dikhane ke liye Riverpod state use kar rahe hain
+                                        final response = await ref.read(
+                                          otpProvider(otpBody).future,
+                                        );
+                                        var box = await Hive.openBox("data");
+                                        await box.put("token", response.token);
+                                        await box.put(
+                                          "id",
+                                          response.user!.id.toString(),
+                                        );
+                                        await box.put(
+                                          "fullName",
+                                          response.user!.fullName ?? "",
+                                        );
+                                        await box.put(
+                                          "address",
+                                          response.user!.address ?? "",
+                                        );
+                                        await box.put(
+                                          "city",
+                                          response.user!.city ?? "",
+                                        );
+                                        await box.put(
+                                          "phoneNumber",
+                                          response.user!.phoneNumber,
+                                        );
+                                        Fluttertoast.showToast(
+                                          msg: "Login Successful",
+                                        );
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (_) => HomePage(),
+                                          ),
+                                          (route) => false,
+                                        );
+                                      } catch (e) {
+                                        log("OTP Verification Failed: $e");
+                                        Fluttertoast.showToast(
+                                          msg: "Invalid OTP",
+                                        );
+                                      }
+                                    }
+                                    : null, // Jab OTP < 6 ho, button disabled
 
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFF891AFF),
@@ -296,24 +308,15 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                         ),
                       ),
 
-
+                      SizedBox(height: 80.h),
                     ],
                   ),
                 ),
-
-
               ],
             ),
-
           ],
         ),
-
       ),
-
-
-
-
     );
-
   }
 }

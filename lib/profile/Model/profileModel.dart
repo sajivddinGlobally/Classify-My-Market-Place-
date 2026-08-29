@@ -36,24 +36,24 @@ class ProfileModel {
 class Data {
   int id;
   String fullName;
-  String phoneNumber;
+  String? phoneNumber;
   String? address;
   String? city;
   String? pincode;
   String profile_approved;
-  dynamic image;
+  String? image;
   DateTime createdAt;
   DateTime updatedAt;
 
   Data({
     required this.id,
     required this.fullName,
-    required this.phoneNumber,
+    this.phoneNumber,
     this.address,
     this.city,
     this.pincode,
     required this.profile_approved,
-    required this.image,
+    this.image,
     required this.createdAt,
     required this.updatedAt,
   });

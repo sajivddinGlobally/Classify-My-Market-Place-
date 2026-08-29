@@ -1210,7 +1210,6 @@ class EditProfileBody extends StatelessWidget {
 // }
 
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -1223,6 +1222,7 @@ import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shopping_app_olx/HelpSupport/helpAndSupport.dart';
+import 'package:shopping_app_olx/googleLogin/googleAuthService.dart';
 import 'package:shopping_app_olx/profile/service/profileController.dart';
 import '../edit/editProfile.dart';
 import '../listing/service/getlistingController.dart';
@@ -1314,10 +1314,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                                 data.data.image == null
                                             ? Icon(Icons.person, size: 60.sp)
                                             : Image.network(
-                                              data.data.image,
+                                              data.data.image ?? "",
                                               width: 126.w,
                                               height: 126.h,
                                               fit: BoxFit.cover,
+                                              errorBuilder: (
+                                                context,
+                                                error,
+                                                stackTrace,
+                                              ) {
+                                                return Center(
+                                                  child: Icon(
+                                                    Icons.person,
+                                                    size: 60.sp,
+                                                  ),
+                                                );
+                                              },
                                             ),
                                   ),
                                 ),
@@ -1331,14 +1343,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                   color: Color.fromARGB(255, 33, 36, 38),
                                 ),
                               ),
-                              Text(
-                                "+91 ${data.data.phoneNumber}",
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromARGB(255, 97, 91, 104),
+                              if (data.data.phoneNumber != null)
+                                Text(
+                                  "+91 ${data.data.phoneNumber}",
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromARGB(255, 97, 91, 104),
+                                  ),
                                 ),
-                              ),
                               SizedBox(height: 25.h),
                               Container(
                                 width: 120.w,
@@ -1505,7 +1518,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                             right: 25.w,
                                           ),
                                           child: GestureDetector(
-                                            onTap: () {
+                                            onTap: () async {
+                                              final googleAuth =
+                                                  GoogleAuthService();
+                                              await googleAuth.signOut();
+
                                               box.clear();
                                               Fluttertoast.showToast(
                                                 msg: "Logout successful",
@@ -1638,7 +1655,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         }
                         return Center(child: Text(error.toString()));
                       },
-                      loading: () => Center(child: CircularProgressIndicator()),
+                      loading:
+                          () => SizedBox(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height / 1.2,
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
                     ),
                   ],
                 ),

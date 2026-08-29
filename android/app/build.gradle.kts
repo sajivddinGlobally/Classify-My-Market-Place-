@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.myMarketPlace"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "26.2.11394342"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -42,7 +42,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("C:/Users/Globally-04/Documents/Classify-main/classify.jks")
+            storeFile = file("C:/Users/Globally-04/Classify-main/android/app/classify.jks")
             storePassword = "123456"
             keyAlias = "classify"
             keyPassword = "123456"

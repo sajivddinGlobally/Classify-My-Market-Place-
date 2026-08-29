@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "1015566366361",
-    "project_id": "mmp--mymarketplace",
-    "storage_bucket": "mmp--mymarketplace.firebasestorage.app"
+    "project_number": "420482925865",
+    "project_id": "mymarketplace-298d9",
+    "storage_bucket": "mymarketplace-298d9.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1015566366361:android:77e73796aab2a4843f2a08",
+        "mobilesdk_app_id": "1:420482925865:android:00182183adb4354cd86338",
         "android_client_info": {
-          "package_name": "com.example.shopping_app_olx"
+          "package_name": "com.myMarketPlace"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "420482925865-91qd57s4214abbt0uev0geidfjmn6vj5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myMarketPlace",
+            "certificate_hash": "61db0c54679959b01f8b46739dfc0ea6166d050f"
+          }
+        },
+        {
+          "client_id": "420482925865-d8lguadsoeasrue4uge85vnu87ookqtt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAX-DNcknidZS4yF39jn-XIwZO0aKLDEB0"
+          "current_key": "AIzaSyAe8p8Hf06W3wXd8WlC5D8rzB1DEJFHPII"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420482925865-d8lguadsoeasrue4uge85vnu87ookqtt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

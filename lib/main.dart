@@ -14,26 +14,46 @@ import 'package:shopping_app_olx/home/home.page.dart';
 import 'package:shopping_app_olx/login/login.page.dart';
 import 'package:shopping_app_olx/noInterNet.dart' show NoInternetPage;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'firbaseOption.dart';
 import 'notificationService.dart';
+import 'package:facebook_app_events/facebook_app_events.dart';
+
+final facebookAppEvents = FacebookAppEvents();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  facebookAppEvents.setAdvertiserTracking(enabled: true);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Initialize Firebase Analytics
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
+  // Initialize Facebook SDK auto logging
+  initFacebook();
+
   await NotificationService().init();
   MobileAds.instance.initialize();
   await Hive.initFlutter();
   await Hive.openBox("data");
   runApp(ProviderScope(child: MyApp()));
 }
+
+void initFacebook() {
+  facebookAppEvents.setAutoLogAppEventsEnabled(true);
+}
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
   @override
   ConsumerState<MyApp> createState() => _MyAppState();
 }
+
 class _MyAppState extends ConsumerState<MyApp> {
   late final StreamSubscription<InternetStatus> _listener;
+
   @override
   void initState() {
     super.initState();
@@ -49,12 +69,14 @@ class _MyAppState extends ConsumerState<MyApp> {
       }
     });
   }
+
   void listenForegroundNotification() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print("🔹 Foreground message: ${message.data}");
       // You can show a dialog/snackbar here if needed
     });
   }
+
   // Handle notification click (terminated + background)
   void setupInteractedMessage() async {
     // App terminated
@@ -67,23 +89,27 @@ class _MyAppState extends ConsumerState<MyApp> {
     // App background
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
   }
+
   void _handleMessage(RemoteMessage message) {
     if (message.data.isNotEmpty) {
       final String id = message.data['userid'] ?? '';
       final String title = message.data['fullname'] ?? 'No Title';
 
       navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => ChatingPage(
-          conversationId: '',
-            userid: id, name: title)),
+        MaterialPageRoute(
+          builder:
+              (_) => ChatingPage(conversationId: '', userid: id, name: title),
+        ),
       );
     }
   }
+
   @override
   void dispose() {
     _listener.cancel();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     var box = Hive.box("data");
@@ -104,7 +130,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             ),
 
-            home: LocationPermissionPage(), // Check if token exists
+            home: LocationPermissionPage(),
 
             routes: {
               '/home': (context) => const HomePage(),
@@ -116,6 +142,4 @@ class _MyAppState extends ConsumerState<MyApp> {
       },
     );
   }
-
 }
-

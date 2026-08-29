@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Replace these with the actual App ID and Client Token from Meta Business Manager -->
+    <string name="facebook_app_id">1417424600249250</string>
+    <string name="facebook_client_token">fed66658779587813f09408b86b86e22</string>
+</resources>
